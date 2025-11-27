@@ -1,6 +1,6 @@
-/Users/mohammedsaleemkhatib/Documents/Gravity/backend/src/main/java/com/example/learning/config/WebConfig.java
-/Users/mohammedsaleemkhatib/Documents/Gravity/backend/src/main/java/com/example/learning/controller/FileUploadController.java
-/Users/mohammedsaleemkhatib/Documents/Gravity/backend/src/main/java/com/example/learning/entity/Learning.java
-/Users/mohammedsaleemkhatib/Documents/Gravity/backend/src/main/java/com/example/learning/repository/LearningRepository.java
-/Users/mohammedsaleemkhatib/Documents/Gravity/backend/src/main/java/com/example/learning/LearningApplication.java
-/Users/mohammedsaleemkhatib/Documents/Gravity/backend/src/main/java/com/example/learning/controller/LearningController.java
+/Users/mohammedsaleemkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/repository/LearningRepository.java
+/Users/mohammedsaleemkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/controller/FileUploadController.java
+/Users/mohammedsaleemkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/config/WebConfig.java
+/Users/mohammedsaleemkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/LearningApplication.java
+/Users/mohammedsaleemkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/controller/LearningController.java
+/Users/mohammedsaleemkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/entity/Learning.java
