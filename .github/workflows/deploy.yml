@@ -44,7 +44,7 @@ jobs:
         mvn test
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: backend-jar
         path: backend/target/learning-0.0.1-SNAPSHOT.jar
