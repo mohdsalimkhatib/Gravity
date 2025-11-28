@@ -59,7 +59,7 @@ jobs:
 
     - name: Deploy to Railway
       env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        RAILWAY_TOKEN: ${{ secrets.MSK_TOKEN }}
       run: |
         # Install Railway CLI
         npm i -g @railway/cli
