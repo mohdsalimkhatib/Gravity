@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/gravity
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -49,29 +53,90 @@ jobs:
         name: backend-jar
         path: backend/target/learning-0.0.1-SNAPSHOT.jar
 
-  deploy:
+  docker-build-push:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
     - uses: actions/checkout@v3
 
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: backend-jar
+        path: backend/target
 
-    - name: Deploy to NETLIFY
-    # Set environment variables for the step
-      env:
-        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
-        NETLIFY_SITE_ID: 'fd8acd39-4923-4b8d-b610-4ae3ec64d4b9'
-      run: |
-        # Install Netlify CLI globally
-        npm install -g netlify-cli
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-        # You would typically have a 'npm run build' step BEFORE this, 
-        # ensuring your built files are ready in a directory (e.g., 'dist')
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-        # Deploy to Netlify using the correct flags and environment variables
-        # --prod: deploys to the main site URL
-        # --dir: specifies the directory to publish (change 'dist' if yours is different)
-        netlify deploy --prod --dir=dist --message="Deployed via GitHub Actions"
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Docker Hub Description
+      uses: peter-evans/dockerhub-description@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: ${{ env.IMAGE_NAME }}
+        short-description: "Gravity - React Frontend + Spring Boot 3.5 Backend"
+        description: |
+          # Gravity Application
+          A full-stack web application with:
+          - React 19.2 Frontend
+          - Spring Boot 3.5.0 Backend
+          - Java 21 LTS
+          - PostgreSQL Database
+          
+          ## Quick Start
+          ```bash
+          docker run -p 8080:8080 \
+            -e DB_HOST=your-db-host \
+            -e DB_PORT=5432 \
+            -e DB_NAME=learningdb \
+            -e DB_USER=postgres \
+            -e DB_PASSWORD=your-password \
+            ${{ env.IMAGE_NAME }}:latest
+          ```
+          
+          ## Environment Variables
+          - `PORT`: Application port (default: 8080)
+          - `DB_HOST`: Database hostname
+          - `DB_PORT`: Database port (default: 5432)
+          - `DB_NAME`: Database name
+          - `DB_USER`: Database user
+          - `DB_PASSWORD`: Database password
+          - `SPRING_PROFILES_ACTIVE`: Spring profile (dev/prod)
+
+    - name: Image digest
+      run: echo ${{ steps.docker_build.outputs.digest }}
 
