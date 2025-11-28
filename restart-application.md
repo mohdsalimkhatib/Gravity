@@ -51,7 +51,7 @@ The frontend will be available at `http://localhost:5173`
 lsof -t -i :8080 | xargs kill -9
 
 # Start backend
-cd /Users/mohammedsaleemkhatib/Documents/Gravity/backend
+cd /Users/mohammedsaleemkhatib/Documents/KnowledgeBaseApp/Gravity/backend
 mvn spring-boot:run
 ```
 
@@ -62,7 +62,7 @@ mvn spring-boot:run
 lsof -t -i :5173 | xargs kill -9
 
 # Start frontend
-cd /Users/mohammedsaleemkhatib/Documents/Gravity/frontend
+cd /Users/mohammedsaleemkhatib/Documents/KnowledgeBaseApp/Gravity/frontend
 npm run dev
 ```
 
