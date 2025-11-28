@@ -62,7 +62,7 @@ jobs:
     # Set environment variables for the step
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
-        NETLIFY_SITE_ID: mysite
+        NETLIFY_SITE_ID: 'fd8acd39-4923-4b8d-b610-4ae3ec64d4b9'
       run: |
         # Install Netlify CLI globally
         npm install -g netlify-cli
