@@ -57,13 +57,21 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Deploy to Railway
+
+    - name: Deploy to NETLIFY
+    # Set environment variables for the step
       env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
+        NETLIFY_SITE_ID: mysite
       run: |
-        # Install Railway CLI
-        npm i -g @railway/cli
-        
-        # Deploy
-        railway up
-      # Note: Configure RAILWAY_TOKEN in GitHub Secrets
+        # Install Netlify CLI globally
+        npm install -g netlify-cli
+
+        # You would typically have a 'npm run build' step BEFORE this, 
+        # ensuring your built files are ready in a directory (e.g., 'dist')
+
+        # Deploy to Netlify using the correct flags and environment variables
+        # --prod: deploys to the main site URL
+        # --dir: specifies the directory to publish (change 'dist' if yours is different)
+        netlify deploy --prod --dir=dist --message="Deployed via GitHub Actions"
+
