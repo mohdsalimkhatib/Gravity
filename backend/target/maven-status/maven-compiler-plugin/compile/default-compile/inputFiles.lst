@@ -1,11 +1,13 @@
 /Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/filter/JwtAuthenticationFilter.java
-/Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/controller/LearningController.java
+/Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/service/UserDetailsServiceImpl.java
 /Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/config/WebConfig.java
-/Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/entity/Learning.java
 /Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/config/SecurityConfig.java
 /Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/controller/AuthController.java
+/Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/service/JwtService.java
+/Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/controller/LearningController.java
+/Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/entity/Learning.java
+/Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/entity/User.java
 /Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/repository/LearningRepository.java
 /Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/repository/UserRepository.java
 /Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/controller/FileUploadController.java
-/Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/service/JwtService.java
 /Users/mkhatib/Documents/KnowledgeBaseApp/Gravity/backend/src/main/java/com/example/learning/LearningApplication.java
