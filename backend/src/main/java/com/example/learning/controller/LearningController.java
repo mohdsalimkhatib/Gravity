@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/learnings")
+@RequestMapping("/learnings")
 @CrossOrigin(origins = "http://localhost:5173") // Allow React frontend
 public class LearningController {
 

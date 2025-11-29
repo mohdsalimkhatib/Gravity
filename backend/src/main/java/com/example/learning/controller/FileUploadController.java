@@ -12,7 +12,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/upload")
+@RequestMapping("/upload")
 @CrossOrigin(origins = "http://localhost:5173")
 public class FileUploadController {
 
