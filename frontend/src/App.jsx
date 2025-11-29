@@ -33,7 +33,7 @@ function App() {
 
   const fetchLearnings = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/learnings');
+      const response = await fetch('https://localhost:8080/api/learnings');
       if (response.ok) {
         const data = await response.json();
         setLearnings(data);
@@ -69,7 +69,7 @@ function App() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this learning?')) {
       try {
-        await fetch(`http://localhost:8080/api/learnings/${id}`, {
+        await fetch(`https://localhost:8080/api/learnings/${id}`, {
           method: 'DELETE',
         });
         fetchLearnings();
@@ -82,8 +82,8 @@ function App() {
   const handleSubmit = async (formData) => {
     try {
       const url = editingItem
-        ? `http://localhost:8080/api/learnings/${editingItem.id}`
-        : 'http://localhost:8080/api/learnings';
+        ? `https://localhost:8080/api/learnings/${editingItem.id}`
+        : 'https://localhost:8080/api/learnings';
 
       const method = editingItem ? 'PUT' : 'POST';
 

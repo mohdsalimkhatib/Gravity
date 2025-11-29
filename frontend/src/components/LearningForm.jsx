@@ -63,7 +63,7 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
         formData.append('file', file);
 
         try {
-            const response = await fetch('http://localhost:8080/api/upload', {
+            const response = await fetch('https://localhost:8080/api/upload', {
                 method: 'POST',
                 body: formData,
             });
