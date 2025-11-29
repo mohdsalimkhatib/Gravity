@@ -3,6 +3,7 @@ package com.example.learning.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -43,7 +44,10 @@ public class FileUploadController {
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             // Return the file download URI
-            String fileDownloadUri = "http://localhost:8080/uploads/" + fileName;
+            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/uploads/")
+                    .path(fileName)
+                    .toUriString();
 
             return ResponseEntity.ok(fileDownloadUri);
         } catch (IOException ex) {

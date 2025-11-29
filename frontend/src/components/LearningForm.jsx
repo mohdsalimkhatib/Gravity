@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'Life'] }) => {
     const [formData, setFormData] = useState({
@@ -14,6 +14,7 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
     const [customCategory, setCustomCategory] = useState('');
     const [uploading, setUploading] = useState(false);
     const [customProps, setCustomProps] = useState([]); // [{key: '', value: ''}, ...]
+    const editorRef = useRef(null);
 
     useEffect(() => {
         if (initialData) {
@@ -29,6 +30,15 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
                     : initialData.customProperties;
                 const propsArray = Object.entries(props).map(([key, value]) => ({ key, value }));
                 setCustomProps(propsArray);
+            }
+            // Initialize editor with existing description
+            if (initialData.description && editorRef.current) {
+                editorRef.current.innerHTML = initialData.description;
+            }
+        } else {
+            // Reset editor for new form
+            if (editorRef.current) {
+                editorRef.current.innerHTML = '';
             }
         }
     }, [initialData, categories]);
@@ -93,6 +103,18 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
         const updated = [...customProps];
         updated[index][field] = value;
         setCustomProps(updated);
+    };
+
+    const handleEditorChange = () => {
+        if (editorRef.current) {
+            const htmlContent = editorRef.current.innerHTML;
+            setFormData(prev => ({ ...prev, description: htmlContent }));
+        }
+    };
+
+    const execCommand = (command, value = null) => {
+        document.execCommand(command, false, value);
+        editorRef.current?.focus();
     };
 
     const handleSubmit = (e) => {
@@ -176,14 +198,149 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
 
                 <div>
                     <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Description</label>
-                    <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        required
-                        rows="4"
-                        placeholder="Describe your learning..."
-                    />
+                    <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                        {/* Toolbar */}
+                        <div style={{
+                            padding: '8px',
+                            borderBottom: '1px solid #e2e8f0',
+                            background: '#f8fafc',
+                            display: 'flex',
+                            gap: '4px',
+                            flexWrap: 'wrap'
+                        }}>
+                            <button
+                                type="button"
+                                onClick={() => execCommand('bold')}
+                                style={{
+                                    padding: '4px 8px',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '4px',
+                                    background: 'white',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold'
+                                }}
+                                title="Bold"
+                            >
+                                B
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => execCommand('italic')}
+                                style={{
+                                    padding: '4px 8px',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '4px',
+                                    background: 'white',
+                                    cursor: 'pointer',
+                                    fontStyle: 'italic'
+                                }}
+                                title="Italic"
+                            >
+                                I
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => execCommand('underline')}
+                                style={{
+                                    padding: '4px 8px',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '4px',
+                                    background: 'white',
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline'
+                                }}
+                                title="Underline"
+                            >
+                                U
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => execCommand('insertUnorderedList')}
+                                style={{
+                                    padding: '4px 8px',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '4px',
+                                    background: 'white',
+                                    cursor: 'pointer'
+                                }}
+                                title="Bullet List"
+                            >
+                                •
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => execCommand('insertOrderedList')}
+                                style={{
+                                    padding: '4px 8px',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '4px',
+                                    background: 'white',
+                                    cursor: 'pointer'
+                                }}
+                                title="Numbered List"
+                            >
+                                1.
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => execCommand('justifyLeft')}
+                                style={{
+                                    padding: '4px 8px',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '4px',
+                                    background: 'white',
+                                    cursor: 'pointer'
+                                }}
+                                title="Align Left"
+                            >
+                                ⬅
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => execCommand('justifyCenter')}
+                                style={{
+                                    padding: '4px 8px',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '4px',
+                                    background: 'white',
+                                    cursor: 'pointer'
+                                }}
+                                title="Align Center"
+                            >
+                                ⬌
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => execCommand('justifyRight')}
+                                style={{
+                                    padding: '4px 8px',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '4px',
+                                    background: 'white',
+                                    cursor: 'pointer'
+                                }}
+                                title="Align Right"
+                            >
+                                ➡
+                            </button>
+                        </div>
+
+                        {/* Editor */}
+                        <div
+                            ref={editorRef}
+                            contentEditable
+                            onInput={handleEditorChange}
+                            style={{
+                                minHeight: '200px',
+                                padding: '12px',
+                                outline: 'none',
+                                fontFamily: 'inherit',
+                                fontSize: '14px',
+                                lineHeight: '1.6'
+                            }}
+                            placeholder="Describe your learning..."
+                        />
+                    </div>
                 </div>
 
                 <div>

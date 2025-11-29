@@ -42,14 +42,13 @@ const LearningDetail = ({ learning, onClose, onEdit }) => {
                     <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
                         Description
                     </h3>
-                    <p style={{
+                    <div style={{
                         color: 'var(--text-secondary)',
                         lineHeight: '1.8',
-                        fontSize: '1rem',
-                        whiteSpace: 'pre-wrap'
-                    }}>
-                        {learning.description}
-                    </p>
+                        fontSize: '1rem'
+                    }}
+                    dangerouslySetInnerHTML={{ __html: learning.description || '' }}
+                    />
                 </div>
 
                 {learning.tags && (

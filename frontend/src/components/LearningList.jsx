@@ -22,9 +22,9 @@ const LearningList = ({ learnings, onEdit, onDelete, onView }) => {
           </div>
 
           <h3 style={{ margin: '0 0 0.5rem 0' }}>{learning.title}</h3>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '1.5rem' }}>
-            {learning.description}
-          </p>
+          <div style={{ color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '1.5rem' }}
+               dangerouslySetInnerHTML={{ __html: learning.description || '' }}
+          />
 
           {learning.imageUrl && (
             <div style={{ marginBottom: '1.5rem' }}>

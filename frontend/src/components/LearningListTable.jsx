@@ -108,9 +108,9 @@ const LearningListTable = ({ learnings, onEdit, onDelete, onView, sortBy, setSor
                                     WebkitLineClamp: 2,
                                     WebkitBoxOrient: 'vertical',
                                     lineHeight: '1.4'
-                                }}>
-                                    {learning.description}
-                                </div>
+                                }}
+                                dangerouslySetInnerHTML={{ __html: learning.description || '' }}
+                                />
                             </td>
                             <td>
                                 {learning.tags && (
