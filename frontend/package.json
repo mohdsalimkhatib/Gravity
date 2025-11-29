@@ -10,11 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "draft-js": "^0.11.7",
-    "draftjs-to-html": "^0.9.1",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-draft-wysiwyg": "^1.15.0"
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
