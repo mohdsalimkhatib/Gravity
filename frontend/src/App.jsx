@@ -3,10 +3,24 @@ import LearningList from './components/LearningList';
 import LearningListTable from './components/LearningListTable';
 import LearningForm from './components/LearningForm';
 import LearningDetail from './components/LearningDetail';
+import Login from './components/Login';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [learnings, setLearnings] = useState([]);
   const [view, setView] = useState('list'); // 'list', 'add', 'edit', 'view'
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Optionally validate token here
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  if (!isAuthenticated) {
+    return <Login />;
+  }
   const [editingItem, setEditingItem] = useState(null);
   const [viewingItem, setViewingItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');

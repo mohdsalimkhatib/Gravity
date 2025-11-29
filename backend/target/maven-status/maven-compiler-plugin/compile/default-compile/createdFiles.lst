@@ -1,6 +1,0 @@
-com/example/learning/repository/LearningRepository.class
-com/example/learning/entity/Learning.class
-com/example/learning/config/WebConfig.class
-com/example/learning/LearningApplication.class
-com/example/learning/controller/FileUploadController.class
-com/example/learning/controller/LearningController.class
