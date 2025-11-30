@@ -7,7 +7,7 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
         category: categories[0] || 'Job',
         date: new Date().toISOString().split('T')[0],
         tags: '',
-        imageUrl: '',
+        attachments: [],
         customProperties: {}
     });
     const [isCustomCategory, setIsCustomCategory] = useState(false);
@@ -18,7 +18,10 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
 
     useEffect(() => {
         if (initialData) {
-            setFormData(initialData);
+            setFormData({
+                ...initialData,
+                attachments: initialData.attachments ? (typeof initialData.attachments === 'string' ? JSON.parse(initialData.attachments) : initialData.attachments) : []
+            });
             if (!categories.includes(initialData.category)) {
                 setIsCustomCategory(true);
                 setCustomCategory(initialData.category);
@@ -36,7 +39,17 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
                 editorRef.current.innerHTML = initialData.description;
             }
         } else {
-            // Reset editor for new form
+            // Reset form
+            setFormData({
+                title: '',
+                description: '',
+                category: categories[0] || 'Job',
+                date: new Date().toISOString().split('T')[0],
+                tags: '',
+                attachments: [],
+                customProperties: {}
+            });
+            setCustomProps([]);
             if (editorRef.current) {
                 editorRef.current.innerHTML = '';
             }
@@ -64,31 +77,76 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
         setFormData(prev => ({ ...prev, category: e.target.value }));
     };
 
-    const handleImageUpload = async (e) => {
+    const handleAddAttachments = async (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+
+        setUploading(true);
+        const formDataObj = new FormData();
+        files.forEach(file => formDataObj.append('files', file));
+
+        try {
+            const response = await fetch('http://localhost:8080/api/upload/multiple', {
+                method: 'POST',
+                body: formDataObj,
+            });
+
+            if (response.ok) {
+                const newAttachments = JSON.parse(await response.text());
+                setFormData(prev => ({
+                    ...prev,
+                    attachments: [...prev.attachments, ...newAttachments]
+                }));
+            } else {
+                console.error('Failed to upload attachments');
+            }
+        } catch (error) {
+            console.error('Error uploading attachments:', error);
+        } finally {
+            setUploading(false);
+            e.target.value = ''; // Reset input
+        }
+    };
+
+    const handleReplaceAttachment = async (index, e) => {
         const file = e.target.files[0];
         if (!file) return;
 
         setUploading(true);
-        const formData = new FormData();
-        formData.append('file', file);
+        const formDataObj = new FormData();
+        formDataObj.append('files', file);
 
         try {
-            const response = await fetch('http://localhost:8080/api/upload', {
+            const response = await fetch('http://localhost:8080/api/upload/multiple', {
                 method: 'POST',
-                body: formData,
+                body: formDataObj,
             });
 
             if (response.ok) {
-                const imageUrl = await response.text();
-                setFormData(prev => ({ ...prev, imageUrl }));
+                const newAttachments = JSON.parse(await response.text());
+                if (newAttachments.length > 0) {
+                    setFormData(prev => {
+                        const updated = [...prev.attachments];
+                        updated[index] = newAttachments[0];
+                        return { ...prev, attachments: updated };
+                    });
+                }
             } else {
-                console.error('Failed to upload image');
+                console.error('Failed to replace attachment');
             }
         } catch (error) {
-            console.error('Error uploading image:', error);
+            console.error('Error replacing attachment:', error);
         } finally {
             setUploading(false);
+            e.target.value = ''; // Reset input
         }
+    };
+
+    const handleRemoveAttachment = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            attachments: prev.attachments.filter((_, i) => i !== index)
+        }));
     };
 
     const handleAddCustomProperty = () => {
@@ -128,6 +186,7 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
         });
         const dataToSubmit = {
             ...formData,
+            attachments: formData.attachments.length > 0 ? JSON.stringify(formData.attachments) : null,
             customProperties: Object.keys(customPropertiesObj).length > 0
                 ? JSON.stringify(customPropertiesObj)
                 : null
@@ -344,29 +403,101 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
                 </div>
 
                 <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Image</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        disabled={uploading}
-                    />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <label style={{ fontWeight: '500' }}>Attachments</label>
+                        <input
+                            type="file"
+                            multiple
+                            accept="image/*,.pdf,.doc,.docx,.txt"
+                            onChange={handleAddAttachments}
+                            disabled={uploading}
+                            style={{ fontSize: '0.875rem' }}
+                        />
+                    </div>
                     {uploading && <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Uploading...</p>}
-                    {formData.imageUrl && (
-                        <div style={{ marginTop: '0.5rem' }}>
-                            <img
-                                src={formData.imageUrl}
-                                alt="Preview"
-                                style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', objectFit: 'cover' }}
-                            />
-                            <button
-                                type="button"
-                                className="btn-secondary"
-                                style={{ display: 'block', marginTop: '0.5rem', fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
-                                onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}
-                            >
-                                Remove Image
-                            </button>
+                    {formData.attachments.length === 0 ? (
+                        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                            No attachments yet. Select files above to add them.
+                        </p>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            {formData.attachments.map((attachment, index) => {
+                                const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(attachment.filename);
+                                return (
+                                    <div key={index} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        padding: '0.5rem',
+                                        border: '1px solid #e2e8f0',
+                                        borderRadius: '8px',
+                                        background: '#f8fafc'
+                                    }}>
+                                        {isImage ? (
+                                            <img
+                                                src={attachment.url}
+                                                alt={attachment.filename}
+                                                style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }}
+                                            />
+                                        ) : (
+                                            <div style={{
+                                                width: '60px',
+                                                height: '60px',
+                                                background: '#e2e8f0',
+                                                borderRadius: '4px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '1.5rem',
+                                                color: '#64748b'
+                                            }}>
+                                                📄
+                                            </div>
+                                        )}
+                                        <div style={{ flex: '1', minWidth: '0' }}>
+                                            <p style={{
+                                                fontSize: '0.875rem',
+                                                fontWeight: '500',
+                                                margin: '0',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis'
+                                            }}>
+                                                {attachment.filename}
+                                            </p>
+                                            <a
+                                                href={attachment.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{ fontSize: '0.75rem', color: '#3b82f6' }}
+                                            >
+                                                View/Download
+                                            </a>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                            <label style={{ fontSize: '0.75rem', cursor: 'pointer', color: '#3b82f6' }}>
+                                                Replace
+                                                <input
+                                                    type="file"
+                                                    accept="image/*,.pdf,.doc,.docx,.txt"
+                                                    onChange={(e) => handleReplaceAttachment(index, e)}
+                                                    style={{ display: 'none' }}
+                                                    disabled={uploading}
+                                                />
+                                            </label>
+                                            <button
+                                                type="button"
+                                                className="btn-danger"
+                                                onClick={() => handleRemoveAttachment(index)}
+                                                style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
+                                                title="Remove attachment"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
