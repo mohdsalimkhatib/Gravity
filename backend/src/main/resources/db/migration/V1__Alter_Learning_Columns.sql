@@ -1,6 +1,11 @@
--- Baseline migration: Ensures LEARNING table has CLOB columns for large text content
--- With baseline-on-migrate=true, this migration represents the current schema state
--- Future migrations will alter the schema incrementally without data loss
-
--- This migration is marked as baseline - it represents the current database state
--- No actual SQL execution needed since baseline-on-migrate handles existing schema
+-- Baseline migration: Create table structure (if not exists)
+CREATE TABLE IF NOT EXISTS learning (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255),
+    description VARCHAR(1000),  -- Will be altered in V2
+    category VARCHAR(255),
+    date DATE,
+    tags VARCHAR(255),
+    attachments VARCHAR(1000),  -- Will be altered in V2
+    custom_properties VARCHAR(1000)  -- Will be altered in V2
+);
