@@ -13,4 +13,6 @@
 
 # Test-generated upload files
 backend/uploads/
-data/
+
+# Keep production data directory - contains H2 production database
+# data/

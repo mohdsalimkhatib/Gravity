@@ -1,21 +1,14 @@
 package com.example.learning.repository;
 
 import com.example.learning.entity.Learning;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -144,24 +137,6 @@ class LearningRepositoryTest {
 
         // Then
         assertThat(newCount).isEqualTo(initialCount + 1);
-    }
-
-    @AfterAll
-    static void tearDown() throws IOException {
-        // Clean up test database files after all tests
-        Path dataDir = Paths.get("data");
-        if (Files.exists(dataDir)) {
-            try (Stream<Path> paths = Files.walk(dataDir)) {
-                paths.sorted(Comparator.reverseOrder())
-                     .forEach(path -> {
-                         try {
-                             Files.delete(path);
-                         } catch (IOException e) {
-                             // Ignore cleanup errors in tests
-                         }
-                     });
-            }
-        }
     }
 
     private Learning createTestLearning() {
