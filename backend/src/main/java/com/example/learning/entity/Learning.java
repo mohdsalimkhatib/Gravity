@@ -14,7 +14,7 @@ public class Learning {
 
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "CLOB")
     private String description;
 
     private String category; // e.g., "Job", "Life"
@@ -23,10 +23,10 @@ public class Learning {
 
     private String tags; // Comma separated tags
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "CLOB")
     private String attachments; // JSON string array of {url, filename} objects
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "CLOB")
     private String customProperties; // JSON string for custom key-value pairs
 
     public Long getId() {
