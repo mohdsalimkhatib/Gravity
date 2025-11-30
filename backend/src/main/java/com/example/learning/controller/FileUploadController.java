@@ -62,42 +62,46 @@ public class FileUploadController {
     }
 
     @PostMapping("/multiple")
-    public ResponseEntity<String> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
+    public ResponseEntity<String> uploadMultipleFiles(@RequestParam(value = "files", required = false) MultipartFile[] files) {
         try {
             List<Map<String, String>> attachments = new ArrayList<>();
 
-            for (MultipartFile file : files) {
-                if (!file.isEmpty()) {
-                    // Normalize file name
-                    String originalFileName = file.getOriginalFilename();
-                    String fileExtension = "";
-                    if (originalFileName != null && originalFileName.contains(".")) {
-                        fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            if (files != null) {
+                for (MultipartFile file : files) {
+                    if (!file.isEmpty()) {
+                        // Normalize file name
+                        String originalFileName = file.getOriginalFilename();
+                        String fileExtension = "";
+                        if (originalFileName != null && originalFileName.contains(".")) {
+                            fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+                        }
+                        String fileName = UUID.randomUUID().toString() + fileExtension;
+
+                        // Copy file to the target location
+                        Path targetLocation = this.fileStorageLocation.resolve(fileName);
+                        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+                        // Create download URI
+                        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                                .path("/uploads/")
+                                .path(fileName)
+                                .toUriString();
+
+                        // Add to attachments list
+                        Map<String, String> attachment = new HashMap<>();
+                        attachment.put("url", fileDownloadUri);
+                        attachment.put("filename", originalFileName != null ? originalFileName : "unknown");
+                        attachments.add(attachment);
                     }
-                    String fileName = UUID.randomUUID().toString() + fileExtension;
-
-                    // Copy file to the target location
-                    Path targetLocation = this.fileStorageLocation.resolve(fileName);
-                    Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-                    // Create download URI
-                    String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                            .path("/uploads/")
-                            .path(fileName)
-                            .toUriString();
-
-                    // Add to attachments list
-                    Map<String, String> attachment = new HashMap<>();
-                    attachment.put("url", fileDownloadUri);
-                    attachment.put("filename", originalFileName != null ? originalFileName : "unknown");
-                    attachments.add(attachment);
                 }
             }
 
             // Return JSON array of attachments
             String jsonResponse = objectMapper.writeValueAsString(attachments);
-            return ResponseEntity.ok(jsonResponse);
-        } catch (IOException ex) {
+            return ResponseEntity.ok()
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(jsonResponse);
+        } catch (Exception ex) {
             return ResponseEntity.internalServerError().body("Could not upload files: " + ex.getMessage());
         }
     }
