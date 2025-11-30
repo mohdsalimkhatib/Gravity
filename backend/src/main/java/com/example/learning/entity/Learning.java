@@ -23,7 +23,8 @@ public class Learning {
 
     private String tags; // Comma separated tags
 
-    private String imageUrl;
+    @Column(columnDefinition = "TEXT")
+    private String attachments; // JSON string array of {url, filename} objects
 
     @Column(columnDefinition = "TEXT")
     private String customProperties; // JSON string for custom key-value pairs
@@ -76,12 +77,12 @@ public class Learning {
         this.tags = tags;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getAttachments() {
+        return attachments;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setAttachments(String attachments) {
+        this.attachments = attachments;
     }
 
     public String getCustomProperties() {

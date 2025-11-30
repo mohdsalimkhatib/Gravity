@@ -35,7 +35,7 @@ public class LearningController {
                     learning.setCategory(learningDetails.getCategory());
                     learning.setDate(learningDetails.getDate());
                     learning.setTags(learningDetails.getTags());
-                    learning.setImageUrl(learningDetails.getImageUrl());
+                    learning.setAttachments(learningDetails.getAttachments());
                     learning.setCustomProperties(learningDetails.getCustomProperties());
                     return ResponseEntity.ok(learningRepository.save(learning));
                 })
