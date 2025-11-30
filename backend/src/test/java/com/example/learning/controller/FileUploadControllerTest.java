@@ -1,5 +1,6 @@
 package com.example.learning.controller;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -7,9 +8,12 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -196,6 +200,26 @@ class FileUploadControllerTest {
         // When & Then - Should handle gracefully
         mockMvc.perform(multipart("/upload"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        // Clean up test-generated files after each test
+        Path uploadsDir = Paths.get("backend/uploads");
+        if (Files.exists(uploadsDir)) {
+            try (Stream<Path> paths = Files.walk(uploadsDir)) {
+                paths.sorted(Comparator.reverseOrder())
+                     .forEach(path -> {
+                         try {
+                             if (!Files.isDirectory(path)) {
+                                 Files.delete(path);
+                             }
+                         } catch (IOException e) {
+                             // Ignore cleanup errors in tests
+                         }
+                     });
+            }
+        }
     }
 
     private String getExtensionFromContentType(String contentType) {
