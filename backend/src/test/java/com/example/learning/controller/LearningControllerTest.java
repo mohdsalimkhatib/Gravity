@@ -9,11 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -46,19 +51,26 @@ class LearningControllerTest {
         // Given
         Learning learning1 = createTestLearning(1L, "Learning 1");
         Learning learning2 = createTestLearning(2L, "Learning 2");
-        when(learningRepository.findAll()).thenReturn(Arrays.asList(learning1, learning2));
+        List<Learning> learningList = Arrays.asList(learning1, learning2);
+        Page<Learning> learningPage = new PageImpl<>(learningList, PageRequest.of(0, 10), 2);
+
+        when(learningRepository.findAll(any(Pageable.class))).thenReturn(learningPage);
 
         // When & Then
-        mockMvc.perform(get("/learnings"))
+        mockMvc.perform(get("/learnings?page=0&size=10"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].title").value("Learning 1"))
-                .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].title").value("Learning 2"));
+                .andExpect(jsonPath("$.learnings.length()").value(2))
+                .andExpect(jsonPath("$.learnings[0].id").value(1))
+                .andExpect(jsonPath("$.learnings[0].title").value("Learning 1"))
+                .andExpect(jsonPath("$.learnings[1].id").value(2))
+                .andExpect(jsonPath("$.learnings[1].title").value("Learning 2"))
+                .andExpect(jsonPath("$.currentPage").value(0))
+                .andExpect(jsonPath("$.totalItems").value(2))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.pageSize").value(10));
 
-        verify(learningRepository, times(1)).findAll();
+        verify(learningRepository, times(1)).findAll(any(Pageable.class));
     }
 
     @Test
@@ -174,15 +186,42 @@ class LearningControllerTest {
     @Test
     void testGetAllLearnings_EmptyList() throws Exception {
         // Given
-        when(learningRepository.findAll()).thenReturn(Arrays.asList());
+        Page<Learning> emptyPage = new PageImpl<>(Arrays.asList(), PageRequest.of(0, 10), 0);
+        when(learningRepository.findAll(any(Pageable.class))).thenReturn(emptyPage);
 
         // When & Then
-        mockMvc.perform(get("/learnings"))
+        mockMvc.perform(get("/learnings?page=0&size=10"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$.learnings.length()").value(0))
+                .andExpect(jsonPath("$.totalItems").value(0))
+                .andExpect(jsonPath("$.totalPages").value(0));
 
-        verify(learningRepository, times(1)).findAll();
+        verify(learningRepository, times(1)).findAll(any(Pageable.class));
+    }
+
+    @Test
+    void testGetAllLearnings_WithSearch() throws Exception {
+        // Given
+        Learning learning1 = createTestLearning(1L, "Java Learning");
+        Learning learning2 = createTestLearning(2L, "Spring Learning");
+        List<Learning> searchResults = Arrays.asList(learning1, learning2);
+        Page<Learning> searchPage = new PageImpl<>(searchResults, PageRequest.of(0, 10), 2);
+
+        when(learningRepository.findBySearchTerm(eq("java"), any(Pageable.class))).thenReturn(searchPage);
+
+        // When & Then
+        mockMvc.perform(get("/learnings?page=0&size=10&search=java"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.learnings.length()").value(2))
+                .andExpect(jsonPath("$.learnings[0].title").value("Java Learning"))
+                .andExpect(jsonPath("$.learnings[1].title").value("Spring Learning"))
+                .andExpect(jsonPath("$.currentPage").value(0))
+                .andExpect(jsonPath("$.totalItems").value(2))
+                .andExpect(jsonPath("$.searchTerm").value("java"));
+
+        verify(learningRepository, times(1)).findBySearchTerm(eq("java"), any(Pageable.class));
     }
 
     private Learning createTestLearning(Long id, String title) {
