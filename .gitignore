@@ -1,0 +1,16 @@
+# Compiled class files
+/backend/target/classes/com/example/learning/entity/Learning.class
+/backend/target/classes/com/example/learning/LearningApplication.class
+/backend/target/classes/com/example/learning/controller/LearningController.class
+/backend/target/test-classes/com/example/learning/controller/LearningControllerTest.class
+/backend/target/classes/com/example/learning/repository/LearningRepository.class
+/backend/target/test-classes/com/example/learning/repository/LearningRepositoryTest.class
+/backend/target/test-classes/com/example/learning/entity/LearningTest.class
+/backend/target/classes/com/example/learning/controller/FileUploadController.class
+/backend/target/test-classes/com/example/learning/controller/FileUploadControllerTest.class
+/backend/target/classes/com/example/learning/config/WebConfig.class
+/backend/target/test-classes/com/example/learning/config/WebConfigTest.class
+
+# Test-generated upload files
+backend/uploads/
+data/
