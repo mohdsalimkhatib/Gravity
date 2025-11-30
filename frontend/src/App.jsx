@@ -6,6 +6,14 @@ import LearningDetail from './components/LearningDetail';
 
 function App() {
   const [learnings, setLearnings] = useState([]);
+  const [pagination, setPagination] = useState({
+    currentPage: 0,
+    totalItems: 0,
+    totalPages: 0,
+    pageSize: 10,
+    hasNext: false,
+    hasPrevious: false
+  });
   const [view, setView] = useState('list'); // 'list', 'add', 'edit', 'view'
   const [editingItem, setEditingItem] = useState(null);
   const [viewingItem, setViewingItem] = useState(null);
@@ -17,12 +25,31 @@ function App() {
     fetchLearnings();
   }, []);
 
-  const fetchLearnings = async () => {
+  // Trigger search when search term changes
+  useEffect(() => {
+    // Debounce search to avoid too many API calls
+    const timeoutId = setTimeout(() => {
+      fetchLearnings(0, 10, searchTerm); // Reset to page 0 when searching
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const fetchLearnings = async (page = 0, size = 10, searchTerm = '') => {
     try {
-      const response = await fetch('http://localhost:8080/api/learnings');
+      const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
+      const response = await fetch(`http://localhost:8080/api/learnings?page=${page}&size=${size}${searchParam}`);
       if (response.ok) {
         const data = await response.json();
-        setLearnings(data);
+        setLearnings(data.learnings || []);
+        setPagination({
+          currentPage: data.currentPage || 0,
+          totalItems: data.totalItems || 0,
+          totalPages: data.totalPages || 0,
+          pageSize: data.pageSize || 10,
+          hasNext: data.hasNext || false,
+          hasPrevious: data.hasPrevious || false
+        });
       }
     } catch (error) {
       console.error('Error fetching learnings:', error);
@@ -58,7 +85,7 @@ function App() {
         await fetch(`http://localhost:8080/api/learnings/${id}`, {
           method: 'DELETE',
         });
-        fetchLearnings();
+        fetchLearnings(pagination.currentPage, 10, searchTerm);
       } catch (error) {
         console.error('Error deleting learning:', error);
       }
@@ -82,12 +109,28 @@ function App() {
       });
 
       if (response.ok) {
-        fetchLearnings();
+        fetchLearnings(pagination.currentPage, 10, searchTerm);
         setView('list');
         setEditingItem(null);
       }
     } catch (error) {
       console.error('Error saving learning:', error);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    fetchLearnings(newPage, 10, searchTerm);
+  };
+
+  const handlePreviousPage = () => {
+    if (pagination.hasPrevious) {
+      fetchLearnings(pagination.currentPage - 1, 10, searchTerm);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (pagination.hasNext) {
+      fetchLearnings(pagination.currentPage + 1, 10, searchTerm);
     }
   };
 
@@ -216,6 +259,54 @@ function App() {
             initialData={editingItem}
             categories={allCategories}
           />
+        )}
+
+        {/* Pagination Controls */}
+        {view === 'list' && pagination.totalPages > 1 && (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '1rem',
+            marginTop: '2rem',
+            padding: '1rem',
+            background: 'white',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+          }}>
+            <button
+              className="btn-secondary"
+              onClick={handlePreviousPage}
+              disabled={!pagination.hasPrevious}
+              style={{
+                opacity: pagination.hasPrevious ? 1 : 0.5,
+                cursor: pagination.hasPrevious ? 'pointer' : 'not-allowed'
+              }}
+            >
+              ← Previous
+            </button>
+
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                Page {pagination.currentPage + 1} of {pagination.totalPages}
+              </span>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                ({pagination.totalItems} total items)
+              </span>
+            </div>
+
+            <button
+              className="btn-secondary"
+              onClick={handleNextPage}
+              disabled={!pagination.hasNext}
+              style={{
+                opacity: pagination.hasNext ? 1 : 0.5,
+                cursor: pagination.hasNext ? 'pointer' : 'not-allowed'
+              }}
+            >
+              Next →
+            </button>
+          </div>
         )}
       </main>
     </div>
