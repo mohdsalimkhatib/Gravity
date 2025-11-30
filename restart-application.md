@@ -30,6 +30,7 @@ lsof -t -i :5173 | xargs kill -9
 
 ```bash
 cd /Users/mohammedsaleemkhatib/Documents/Gravity/backend
+mvn test
 mvn spring-boot:run
 ```
 
@@ -52,6 +53,7 @@ lsof -t -i :8080 | xargs kill -9
 
 # Start backend
 cd /Users/mohammedsaleemkhatib/Documents/KnowledgeBaseApp/Gravity/backend
+mvn test
 mvn spring-boot:run
 ```
 
