@@ -9,7 +9,8 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/gravity
+  BACKEND_IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/gravity-backend
+  FRONTEND_IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/gravity-frontend
 
 jobs:
   build:
@@ -96,7 +97,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v4
       with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        images: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
         tags: |
           type=ref,event=branch
           type=semver,pattern={{version}}
@@ -124,6 +125,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+  
     steps:
     - uses: actions/checkout@v3
 
@@ -149,7 +151,7 @@ jobs:
       uses: docker/metadata-action@v4
       with:
         # Pushes to ${{ secrets.DOCKER_USERNAME }}/gravity-frontend
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ env.FRONTEND_IMAGE_NAME }}
+        images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
         tags: |
           type=ref,event=branch
           type=sha,prefix={{branch}}-
