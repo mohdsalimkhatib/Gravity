@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/learnings")
-@CrossOrigin(origins = "http://localhost:5173") // Allow React frontend
+@CrossOrigin(origins = "http://localhost:3000") // Allow React frontend
 public class LearningController {
 
     @Autowired
