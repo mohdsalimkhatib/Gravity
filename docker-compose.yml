@@ -41,7 +41,19 @@ services:
     restart: unless-stopped
     networks:
       - gravity-network
-
+  
+  frontend:
+    # Use 'build' to tell compose to look for a Dockerfile in the current directory ('.')
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    # Map port 8080 on your host machine to port 80 in the container (where Nginx is running)
+    ports:
+      - "3000:80"
+    # Optional: Name the container explicitly for easy reference
+    container_name: react_app_container
+    # Optional: Automatically restart the container if it stops
+    restart: always
 volumes:
   postgres_data:
     driver: local
