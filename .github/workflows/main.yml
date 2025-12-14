@@ -54,7 +54,15 @@ jobs:
         name: backend-jar
         path: backend/target/learning-0.0.1-SNAPSHOT.jar
 
-  docker-build-push:
+        # Uploading frontend source code is needed for the Docker build job to access the frontend directory
+    - name: Upload frontend source code artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-source
+        path: frontend
+
+
+  docker-build-push-backend:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -107,6 +115,60 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+
+    # NEW JOB: for building and pushing the FRONTEND Docker image
+  docker-build-push-frontend:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - uses: actions/checkout@v3
+
+    # Download the source code artifact prepared in the 'build' job
+    - name: Download frontend source code artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-source
+        path: frontend
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Extract metadata (Frontend)
+      id: meta_frontend
+      uses: docker/metadata-action@v4
+      with:
+        # Pushes to ${{ secrets.DOCKER_USERNAME }}/gravity-frontend
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ env.FRONTEND_IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push frontend Docker image
+      uses: docker/build-push-action@v4
+      with:
+        # Crucial: Set the context to the 'frontend' directory
+        context: ./frontend 
+        # The action will look for a Dockerfile inside the 'frontend' context
+        file: frontend/Dockerfile
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta_frontend.outputs.tags }}
+        labels: ${{ steps.meta_frontend.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
 
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
