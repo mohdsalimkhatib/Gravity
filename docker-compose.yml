@@ -12,7 +12,7 @@ services:
       DB_PORT: 5432
       DB_NAME: learningdb
       DB_USER: ${DB_USER:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-mysecretpassword}
+      DB_PASSWORD: ${DB_PASSWORD}
       PORT: 8080
       SPRING_PROFILES_ACTIVE: prod
     depends_on:
@@ -28,7 +28,7 @@ services:
     environment:
       POSTGRES_DB: learningdb
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mysecretpassword}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
