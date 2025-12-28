@@ -38,7 +38,7 @@ function App() {
   const fetchLearnings = async (page = 0, size = 10, searchTerm = '') => {
     try {
       const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
-      const response = await fetch(`http://localhost:8080/api/learnings?page=${page}&size=${size}${searchParam}`);
+      const response = await fetch(`/api/learnings?page=${page}&size=${size}${searchParam}`);
       if (response.ok) {
         const data = await response.json();
         setLearnings(data.learnings || []);
@@ -82,7 +82,7 @@ function App() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this learning?')) {
       try {
-        await fetch(`http://localhost:8080/api/learnings/${id}`, {
+        await fetch(`/api/learnings/${id}`, {
           method: 'DELETE',
         });
         fetchLearnings(pagination.currentPage, 10, searchTerm);
@@ -95,8 +95,8 @@ function App() {
   const handleSubmit = async (formData) => {
     try {
       const url = editingItem
-        ? `http://localhost:8080/api/learnings/${editingItem.id}`
-        : 'http://localhost:8080/api/learnings';
+        ? `/api/learnings/${editingItem.id}`
+        : '/api/learnings';
 
       const method = editingItem ? 'PUT' : 'POST';
 

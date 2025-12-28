@@ -49,11 +49,14 @@ services:
       dockerfile: Dockerfile
     # Map port 8080 on your host machine to port 80 in the container (where Nginx is running)
     ports:
-      - "3000:80"
+      - "80:80"
     # Optional: Name the container explicitly for easy reference
     container_name: react_app_container
     # Optional: Automatically restart the container if it stops
     restart: always
+    networks:
+      - gravity-network 
+      
 volumes:
   postgres_data:
     driver: local

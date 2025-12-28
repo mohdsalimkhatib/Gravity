@@ -18,8 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/upload")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api/upload")
 public class FileUploadController {
 
     private final Path fileStorageLocation;
@@ -49,11 +48,8 @@ public class FileUploadController {
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            // Return the file download URI
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/uploads/")
-                    .path(fileName)
-                    .toUriString();
+        
+            String fileDownloadUri = "/api/uploads/" + fileName;         
 
             return ResponseEntity.ok(fileDownloadUri);
         } catch (IOException ex) {
@@ -81,11 +77,8 @@ public class FileUploadController {
                         Path targetLocation = this.fileStorageLocation.resolve(fileName);
                         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-                        // Create download URI
-                        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path("/uploads/")
-                                .path(fileName)
-                                .toUriString();
+
+                        String fileDownloadUri = "/api/uploads/" + fileName;        
 
                         // Add to attachments list
                         Map<String, String> attachment = new HashMap<>();

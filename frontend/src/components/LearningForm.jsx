@@ -86,7 +86,7 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
         files.forEach(file => formDataObj.append('files', file));
 
         try {
-            const response = await fetch('http://localhost:8080/api/upload/multiple', {
+            const response = await fetch('/api/upload/multiple', {
                 method: 'POST',
                 body: formDataObj,
             });
@@ -117,7 +117,7 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
         formDataObj.append('files', file);
 
         try {
-            const response = await fetch('http://localhost:8080/api/upload/multiple', {
+            const response = await fetch('/api/upload/multiple', {
                 method: 'POST',
                 body: formDataObj,
             });
