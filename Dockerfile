@@ -10,7 +10,7 @@ RUN mvn clean package -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
-RUN apk add --no-cache dumb-init
+RUN apk add --no-cache dumb-init bash
 
 WORKDIR /app
 

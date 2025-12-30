@@ -15,7 +15,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/learnings")
-@CrossOrigin(origins = "http://localhost:3000") // Allow React frontend
 public class LearningController {
 
     @Autowired
@@ -27,6 +26,8 @@ public class LearningController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String search) {
 
+
+        System.out.println("Received request for /learnings");
         Pageable pageable = PageRequest.of(page, size);
         Page<Learning> learningPage;
 

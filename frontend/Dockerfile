@@ -13,6 +13,7 @@ RUN npm run build
 
 # Stage 2: Serve the application with Nginx
 FROM nginx:alpine as production
+RUN apk add --no-cache bash
 
 # This COPY command failed because the 'build' directory wasn't created in Stage 1
 COPY --from=builder /app/dist /usr/share/nginx/html
