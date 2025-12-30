@@ -37,6 +37,7 @@ public class FileUploadController {
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             // Normalize file name
+            System.out.println("Uploading file: " + file.getOriginalFilename());
             String originalFileName = file.getOriginalFilename();
             String fileExtension = "";
             if (originalFileName != null && originalFileName.contains(".")) {
@@ -63,6 +64,7 @@ public class FileUploadController {
     @PostMapping("/multiple")
     public ResponseEntity<String> uploadMultipleFiles(@RequestParam(value = "files", required = false) MultipartFile[] files) {
         try {
+            
             List<Map<String, String>> attachments = new ArrayList<>();
 
             if (files != null) {

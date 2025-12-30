@@ -1,6 +1,7 @@
 package com.example.learning.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -11,8 +12,17 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String uploadPath = Paths.get("uploads").toAbsolutePath().toUri().toString();
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations(uploadPath);
+        // This maps the URL path to your physical file location
+        registry.addResourceHandler("/api/uploads/**")
+                .addResourceLocations("file:./uploads/");
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        // This specifically allows your frontend to access these files
+        registry.addMapping("/api/uploads/**")
+                .allowedOrigins("http://journey.crabdance.com", "http://localhost:8080") // Replace with your frontend domain
+                .allowedMethods("GET", "OPTIONS")
+                .allowedHeaders("*");
     }
 }
