@@ -24,6 +24,7 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -36,6 +37,15 @@ class LearningControllerTest {
     @MockBean
     private LearningRepository learningRepository;
 
+    @MockBean
+    private com.example.learning.security.JwtUtil jwtUtil;
+
+    @MockBean
+    private com.example.learning.security.CustomUserDetailsService customUserDetailsService;
+
+    @MockBean
+    private com.example.learning.repository.UserRepository userRepository;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -47,6 +57,7 @@ class LearningControllerTest {
     }
 
     @Test
+    @org.springframework.security.test.context.support.WithMockUser
     void testGetAllLearnings() throws Exception {
         // Given
         Learning learning1 = createTestLearning(1L, "Learning 1");
@@ -74,6 +85,7 @@ class LearningControllerTest {
     }
 
     @Test
+    @org.springframework.security.test.context.support.WithMockUser
     void testCreateLearning() throws Exception {
         // Given
         Learning inputLearning = createTestLearning(null, "New Learning");
@@ -82,6 +94,7 @@ class LearningControllerTest {
 
         // When & Then
         mockMvc.perform(post("/learnings")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(inputLearning)))
                 .andExpect(status().isOk())
@@ -93,6 +106,7 @@ class LearningControllerTest {
     }
 
     @Test
+    @org.springframework.security.test.context.support.WithMockUser
     void testUpdateLearning_Success() throws Exception {
         // Given
         Learning existingLearning = createTestLearning(1L, "Original Title");
@@ -104,6 +118,7 @@ class LearningControllerTest {
 
         // When & Then
         mockMvc.perform(put("/learnings/1")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedLearning)))
                 .andExpect(status().isOk())
@@ -117,6 +132,7 @@ class LearningControllerTest {
     }
 
     @Test
+    @org.springframework.security.test.context.support.WithMockUser
     void testUpdateLearning_NotFound() throws Exception {
         // Given
         when(learningRepository.findById(1L)).thenReturn(Optional.empty());
@@ -125,6 +141,7 @@ class LearningControllerTest {
 
         // When & Then
         mockMvc.perform(put("/learnings/1")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedLearning)))
                 .andExpect(status().isNotFound());
@@ -134,6 +151,7 @@ class LearningControllerTest {
     }
 
     @Test
+    @org.springframework.security.test.context.support.WithMockUser(roles = "ADMIN")
     void testDeleteLearning_Success() throws Exception {
         // Given
         Learning existingLearning = createTestLearning(1L, "Test Learning");
@@ -141,7 +159,7 @@ class LearningControllerTest {
         doNothing().when(learningRepository).delete(existingLearning);
 
         // When & Then
-        mockMvc.perform(delete("/learnings/1"))
+        mockMvc.perform(delete("/learnings/1").with(csrf()))
                 .andExpect(status().isOk());
 
         verify(learningRepository, times(1)).findById(1L);
@@ -149,12 +167,13 @@ class LearningControllerTest {
     }
 
     @Test
+    @org.springframework.security.test.context.support.WithMockUser(roles = "ADMIN")
     void testDeleteLearning_NotFound() throws Exception {
         // Given
         when(learningRepository.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then
-        mockMvc.perform(delete("/learnings/1"))
+        mockMvc.perform(delete("/learnings/1").with(csrf()))
                 .andExpect(status().isNotFound());
 
         verify(learningRepository, times(1)).findById(1L);
@@ -162,6 +181,7 @@ class LearningControllerTest {
     }
 
     @Test
+    @org.springframework.security.test.context.support.WithMockUser
     void testCreateLearning_WithMinimalData() throws Exception {
         // Given - Learning with only description (no validation currently enforced)
         Learning minimalLearning = new Learning();
@@ -175,6 +195,7 @@ class LearningControllerTest {
 
         // When & Then
         mockMvc.perform(post("/learnings")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(minimalLearning)))
                 .andExpect(status().isOk())
@@ -184,6 +205,7 @@ class LearningControllerTest {
     }
 
     @Test
+    @org.springframework.security.test.context.support.WithMockUser
     void testGetAllLearnings_EmptyList() throws Exception {
         // Given
         Page<Learning> emptyPage = new PageImpl<>(Arrays.asList(), PageRequest.of(0, 10), 0);
@@ -201,6 +223,7 @@ class LearningControllerTest {
     }
 
     @Test
+    @org.springframework.security.test.context.support.WithMockUser
     void testGetAllLearnings_WithSearch() throws Exception {
         // Given
         Learning learning1 = createTestLearning(1L, "Java Learning");
