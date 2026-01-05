@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'Life'] }) => {
+const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'Life'], token }) => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -86,8 +86,14 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
         files.forEach(file => formDataObj.append('files', file));
 
         try {
-            const response = await fetch('/upload/multiple', {
+            const headers = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch('/api/upload/multiple', {
                 method: 'POST',
+                headers,
                 body: formDataObj,
             });
 
@@ -117,8 +123,14 @@ const LearningForm = ({ onSubmit, onCancel, initialData, categories = ['Job', 'L
         formDataObj.append('files', file);
 
         try {
-            const response = await fetch('/upload/multiple', {
+            const headers = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch('/api/upload/multiple', {
                 method: 'POST',
+                headers,
                 body: formDataObj,
             });
 

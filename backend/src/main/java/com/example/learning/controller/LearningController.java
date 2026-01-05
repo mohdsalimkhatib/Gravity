@@ -26,7 +26,6 @@ public class LearningController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String search) {
 
-
         System.out.println("Received request for /learnings");
         Pageable pageable = PageRequest.of(page, size);
         Page<Learning> learningPage;
@@ -79,6 +78,7 @@ public class LearningController {
     }
 
     @DeleteMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteLearning(@PathVariable Long id) {
         return learningRepository.findById(id)
                 .map(learning -> {
