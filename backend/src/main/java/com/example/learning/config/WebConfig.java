@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // This maps the URL path to your physical file location
-        registry.addResourceHandler("/api/uploads/**")
+        registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:./uploads/");
     }
 
@@ -21,7 +21,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         // This specifically allows your frontend to access these files
         registry.addMapping("/api/uploads/**")
-                .allowedOrigins("http://journey.crabdance.com", "http://localhost:8080") // Replace with your frontend domain
+                .allowedOrigins("http://journey.crabdance.com", "http://localhost:8080") // Replace with your frontend
+                                                                                         // domain
                 .allowedMethods("GET", "OPTIONS")
                 .allowedHeaders("*");
     }

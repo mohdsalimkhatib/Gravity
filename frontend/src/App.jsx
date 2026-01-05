@@ -3,8 +3,13 @@ import LearningList from './components/LearningList';
 import LearningListTable from './components/LearningListTable';
 import LearningForm from './components/LearningForm';
 import LearningDetail from './components/LearningDetail';
+import Login from './components/Login';
+import Register from './components/Register';
+import { useAuth } from './context/AuthContext';
 
 function App() {
+  const { isAuthenticated, loading: authLoading, user, logout, token } = useAuth();
+  const [authView, setAuthView] = useState('login'); // 'login' or 'register'
   const [learnings, setLearnings] = useState([]);
   const [pagination, setPagination] = useState({
     currentPage: 0,
@@ -21,24 +26,30 @@ function App() {
   const [sortBy, setSortBy] = useState('date'); // 'date', 'category', 'title'
   const [viewMode, setViewMode] = useState('tiles'); // 'tiles' or 'list'
 
+  // Fetch learnings when authenticated or search term changes
   useEffect(() => {
-    fetchLearnings();
-  }, []);
-
-  // Trigger search when search term changes
-  useEffect(() => {
-    // Debounce search to avoid too many API calls
-    const timeoutId = setTimeout(() => {
-      fetchLearnings(0, 10, searchTerm); // Reset to page 0 when searching
-    }, 300); // 300ms delay
-
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+    if (isAuthenticated) {
+      const timeoutId = setTimeout(() => {
+        fetchLearnings(0, 10, searchTerm);
+      }, searchTerm ? 300 : 0); // Debounce search, but fetch immediately on login
+      return () => clearTimeout(timeoutId);
+    } else {
+      setLearnings([]); // Clear data if not authenticated
+    }
+  }, [isAuthenticated, searchTerm, token]);
 
   const fetchLearnings = async (page = 0, size = 10, searchTerm = '') => {
     try {
       const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
-      const response = await fetch(`/api/learnings?page=${page}&size=${size}${searchParam}`);
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`/api/learnings?page=${page}&size=${size}${searchParam}`, {
+        headers
+      });
+
       if (response.ok) {
         const data = await response.json();
         setLearnings(data.learnings || []);
@@ -82,8 +93,14 @@ function App() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this learning?')) {
       try {
+        const headers = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
         await fetch(`/api/learnings/${id}`, {
           method: 'DELETE',
+          headers
         });
         fetchLearnings(pagination.currentPage, 10, searchTerm);
       } catch (error) {
@@ -100,11 +117,16 @@ function App() {
 
       const method = editingItem ? 'PUT' : 'POST';
 
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(url, {
         method: method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(formData),
       });
 
@@ -159,6 +181,26 @@ function App() {
       return new Date(b.date) - new Date(a.date);
     }
   });
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login/register if not authenticated
+  if (!isAuthenticated) {
+    if (authView === 'login') {
+      return <Login onSwitchToRegister={() => setAuthView('register')} />;
+    } else {
+      return <Register onSwitchToLogin={() => setAuthView('login')} />;
+    }
+  }
 
   return (
     <div className="container">
@@ -221,9 +263,22 @@ function App() {
         )}
 
         {view === 'list' && (
-          <button className="btn-primary" onClick={handleAddClick}>
-            + Add Learning
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginRight: '0.5rem' }}>
+              <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                {user?.username}
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                {user?.roles?.includes('ROLE_ADMIN') && '(Admin)'}
+              </span>
+            </div>
+            <button className="btn-secondary" onClick={logout} style={{ padding: '0.5rem 1rem' }}>
+              Logout
+            </button>
+            <button className="btn-primary" onClick={handleAddClick}>
+              + Add Learning
+            </button>
+          </div>
         )}
       </header>
 
@@ -258,6 +313,7 @@ function App() {
             onCancel={handleCancel}
             initialData={editingItem}
             categories={allCategories}
+            token={token}
           />
         )}
 
