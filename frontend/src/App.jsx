@@ -207,7 +207,7 @@ function App() {
       <header className="header">
         <div>
           <h1 style={{ margin: 0, fontSize: '2rem', background: 'linear-gradient(135deg, #6366f1, #ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Gravity
+
           </h1>
           <p style={{ margin: '0.5rem 0 0', color: 'var(--text-secondary)' }}>Document your journey.</p>
         </div>

@@ -2,7 +2,7 @@
 set -e
 
 echo "================================"
-echo "Building Gravity Application"
+echo "Building Journey Application"
 echo "================================"
 
 # Build backend

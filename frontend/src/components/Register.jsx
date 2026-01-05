@@ -54,7 +54,7 @@ function Register({ onSwitchToLogin }) {
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
                     }}>
-                        Gravity
+                        Journey
                     </h1>
                     <p style={{ margin: '0.5rem 0 0', color: 'var(--text-secondary)' }}>
                         Create an account to start documenting your journey.

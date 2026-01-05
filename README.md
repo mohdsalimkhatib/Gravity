@@ -1,4 +1,4 @@
-# Gravity Application
+# Journey Application
 
 A robust full-stack web application designed for documenting job and life learnings, now featuring a secure authentication system and advanced data management.
 
