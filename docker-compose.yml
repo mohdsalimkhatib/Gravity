@@ -1,11 +1,10 @@
 services:
   backend:
+    #image: mohdsalimkhatib/gravity-backend:latest
     build:
       context: .
       dockerfile: Dockerfile
     container_name: gravity-backend
-    #ports:
-    #- "8080:8080"
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -30,8 +29,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      #ports:
-      #- "5432:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
@@ -43,6 +40,7 @@ services:
 
   frontend:
     # Use 'build' to tell compose to look for a Dockerfile in the current directory ('.')
+    #image: mohdsalimkhatib/gravity-frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
