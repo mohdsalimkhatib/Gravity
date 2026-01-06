@@ -1,6 +1,7 @@
 package com.example.learning.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,8 +25,8 @@ public class FileUploadController {
     private final Path fileStorageLocation;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public FileUploadController() {
-        this.fileStorageLocation = Paths.get("uploads").toAbsolutePath().normalize();
+    public FileUploadController(@Value("${file.upload.path:uploads}") String uploadPath) {
+        this.fileStorageLocation = Paths.get(uploadPath).toAbsolutePath().normalize();
         try {
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
@@ -62,9 +63,10 @@ public class FileUploadController {
     }
 
     @PostMapping("/multiple")
-    public ResponseEntity<String> uploadMultipleFiles(@RequestParam(value = "files", required = false) MultipartFile[] files) {
+    public ResponseEntity<String> uploadMultipleFiles(
+            @RequestParam(value = "files", required = false) MultipartFile[] files) {
         try {
-            
+
             List<Map<String, String>> attachments = new ArrayList<>();
 
             if (files != null) {
