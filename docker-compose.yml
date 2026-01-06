@@ -19,6 +19,8 @@ services:
     restart: unless-stopped
     networks:
       - gravity-network
+    volumes:
+      - ./uploads:/app/uploads
 
   postgres:
     image: postgres:15-alpine
